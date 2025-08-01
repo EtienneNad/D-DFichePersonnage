@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-
+import { Dropdown } from 'react-native-element-dropdown';
 import { MesRaces } from './modeles/ModeleRace';
 import { MesClasses } from './modeles/ModeleClasse';
 import { MesThemes } from './modeles/ModeleTheme';
@@ -33,10 +33,13 @@ import {
 import { MesPersonnages } from './modeles/ModelePersonnage';
 
 function App(): JSX.Element {
+
   const [nomRaces, setNomsRaces] = useState<{ [id: number]: string }>({});
   const [nomClasses, setNomsClasses] = useState<{ [id: number]: string }>({});
   const [selectedRace, setSelectedRace] = useState<string>('');
   const [selectedClasse, setSelectedClasse] = useState<string>('');
+  const [selectedRaceValeur, setSelectedRaceValeur] = useState<{ id: number; name: string } | null>(null);
+  const [selectedClasseValeur, setSelectedClasseValeur] = useState<{ id: number; name: string } | null>(null);
   const [race, setRaces] = useState<MesRaces[]>([]);
   const [theme, setTheme] = useState<MesThemes[]>([]);
   const [personnages, setPersonnages] = useState<MesPersonnages[]>([]);
@@ -49,7 +52,14 @@ function App(): JSX.Element {
     d6: null,
     d4: null,
   });
-
+  const raceDropdownData = race.map((item) => ({
+    label: item.race,
+    value: item.id
+  }));
+  const classeDropdownData = classe.map((item) => ({
+    label: item.classe,
+    value: item.id
+  }));
   const loadTheme = useCallback(async () => {
     try {
       const initTheme = [
@@ -184,180 +194,205 @@ function App(): JSX.Element {
     }
   }, []);
 
-  
-const loadClasse = useCallback(async () => {
-  try {
-    const initClasse = [
-      { id: 1, classe: 'Guerrier' },
-      { id: 2, classe: 'Mage' },
-      { id: 3, classe: 'Druide' },
-    ];
+
+  const loadClasse = useCallback(async () => {
+    try {
+      const initClasse = [
+        { id: 1, classe: 'Guerrier' },
+        { id: 2, classe: 'Mage' },
+        { id: 3, classe: 'Druide' },
+      ];
+      const db = await getDBConnection();
+      await createTableClasse(db);
+      const classesDB = await getClasses(db);
+      if (classesDB.length) {
+        setClasse(classesDB);
+      } else {
+        await ajouterClasse(db, initClasse);
+        setClasse(initClasse);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      await loadRace();
+      await loadTheme();
+      await loadClasse();
+      await loadPersonnage();
+    };
+    init();
+  }, [loadRace, loadTheme, loadClasse, loadPersonnage]);
+
+  useEffect(() => {
+    const chargerInfos = async () => {
+      const nomsR: { [id: number]: string } = {};
+      const nomsC: { [id: number]: string } = {};
+
+      for (const perso of personnages) {
+        const raceNom = await recupererRace(perso.race_id ?? 0);
+        const classeNom = await recupererClasse(perso.classe_id ?? 0);
+        nomsR[perso.id ?? 0] = raceNom;
+        nomsC[perso.id ?? 0] = classeNom;
+      }
+
+      setNomsRaces(nomsR);
+      setNomsClasses(nomsC);
+    };
+
+    if (personnages.length > 0) {
+      chargerInfos();
+    }
+  }, [personnages]);
+  const recupererRace = async (id: number): Promise<string> => {
     const db = await getDBConnection();
-    await createTableClasse(db);
-    const classesDB = await getClasses(db);
-    if (classesDB.length) {
-      setClasse(classesDB);
-    } else {
-      await ajouterClasse(db, initClasse);
-      setClasse(initClasse);
+    const race = await getRaceID(db, id);
+    return race ? race.race : '';
+  };
+  const recupererClasse = async (id: number): Promise<string> => {
+    const db = await getDBConnection();
+    const classe = await getClasseID(db, id);
+    return classe ? classe.classe : '';
+  };
+  const modifierThemes = async (id: number | null, nouveauTheme: string) => {
+    try {
+      const db = await getDBConnection();
+      await modifierTheme(db, id, nouveauTheme);
+      setTheme([{ id, theme: nouveauTheme }]); // mettre à jour l’état local
+    } catch (error) {
+      console.error(error);
+      Alert.alert('La modification du thème a échoué');
     }
-  } catch (error) {
-    console.error(error);
-  }
-}, []);
-
-useEffect(() => {
- const chargerInfos = async () => {
-    const nomsR: { [id: number]: string } = {};
-    const nomsC: { [id: number]: string } = {};
-
-    for (const perso of personnages) {
-      const raceNom = await recupererRace(perso.race_id ?? 0);
-      const classeNom = await recupererClasse(perso.classe_id ?? 0);
-      nomsR[perso.id ?? 0] = raceNom;
-      nomsC[perso.id ?? 0] = classeNom;
-    }
-
-    setNomsRaces(nomsR);
-    setNomsClasses(nomsC);
   };
 
-  if (personnages.length > 0) {
-    chargerInfos();
-  }
-  loadRace();
-  loadTheme();
-  loadClasse();
-  loadPersonnage();
-}, [personnages, loadRace, loadTheme, loadClasse, loadPersonnage]);
-const recupererRace = async (id: number): Promise<string> => {
-  const db = await getDBConnection();
-  const race = await getRaceID(db, id);
-  return race ? race.race : '';
-};
-const recupererClasse = async (id: number): Promise<string> => {
-  const db = await getDBConnection();
-  const classe = await getClasseID(db, id);
-  return classe ? classe.classe : '';
-};
-const modifierThemes = async (id: number | null, nouveauTheme: string) => {
-  try {
-    const db = await getDBConnection();
-    await modifierTheme(db, id, nouveauTheme);
-    setTheme([{ id, theme: nouveauTheme }]); // mettre à jour l’état local
-  } catch (error) {
-    console.error(error);
-    Alert.alert('La modification du thème a échoué');
-  }
-};
+  const changerTheme = () => {
+    if (theme.length === 0) return;
+    const nouveauTheme = theme[0].theme === 'clair' ? 'sombre' : 'clair';
+    modifierThemes(theme[0].id, nouveauTheme);
+  };
 
-const changerTheme = () => {
-  if (theme.length === 0) return;
-  const nouveauTheme = theme[0].theme === 'clair' ? 'sombre' : 'clair';
-  modifierThemes(theme[0].id, nouveauTheme);
-};
+  const genererDe = (faces: number): void => {
+    const valeur = Math.floor(Math.random() * faces) + 1;
+    setDes((prev) => ({ ...prev, [`d${faces}`]: valeur }));
+  };
 
-const genererDe = (faces: number): void => {
-  const valeur = Math.floor(Math.random() * faces) + 1;
-  setDes((prev) => ({ ...prev, [`d${faces}`]: valeur }));
-};
+  const listeDes = [20, 12, 10, 8, 6, 4];
+  const themeActuel = theme[0]?.theme || 'clair';
 
-const listeDes = [20, 12, 10, 8, 6, 4];
-const themeActuel = theme[0]?.theme || 'clair';
-
-return (
-  <ScrollView contentContainerStyle={[styles.scrollContent, themeActuel === 'sombre' && { backgroundColor: '#222' }]}>
-    <Text style={[styles.baseText, themeActuel === 'sombre' && { color: 'white' }]}>
-      Sélectionne ta race :
-    </Text>
-
-    <View style={styles.raceList}>
-      {race.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          onPress={() => setSelectedRace(item.race)}
-          style={[
-            styles.raceButton,
-            selectedRace === item.race && styles.raceButtonSelected,
-          ]}
-        >
-          <Text style={styles.raceText}>{item.race}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-
-    {selectedRace ? (
-      <Text style={styles.selectedRace}>classe choisie : {selectedRace}</Text>
-    ) : null}
-
-    <Text style={[styles.baseText, themeActuel === 'sombre' && { color: 'white' }]}>
-      Sélectionne ta classe :
-    </Text>
-
-    <View style={styles.raceList}>
-      {classe.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          onPress={() => setSelectedClasse(item.classe)}
-          style={[
-            styles.raceButton,
-            selectedClasse === item.classe && styles.raceButtonSelected,
-          ]}
-        >
-          <Text style={styles.raceText}>{item.classe}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-
-    {selectedClasse ? (
-      <Text style={styles.selectedRace}>Classe choisie : {selectedClasse}</Text>
-    ) : null}
-    <View style={styles.buttonContainer}>
-      {listeDes.map((faces) => (
-        <TouchableOpacity
-          key={faces}
-          style={styles.bouton}
-          onPress={() => genererDe(faces)}
-        >
-          <Text style={styles.boutonTexte}>
-            {des[`d${faces}`] !== null ? `${des[`d${faces}`]}` : `d${faces}`}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-
-    <TouchableOpacity style={styles.themeButton} onPress={changerTheme}>
-      <Text style={styles.themeButtonText}>
-        Thème actuel : {themeActuel === 'clair' ? 'Clair' : 'Sombre'} — Changer
+  return (
+    <ScrollView contentContainerStyle={[styles.scrollContent, themeActuel === 'sombre' && { backgroundColor: '#222' }]}>
+      <Text style={[styles.baseText, themeActuel === 'sombre' && { color: 'white' }]}>
+        Sélectionne ta race :
       </Text>
-    </TouchableOpacity>
-{personnages.length > 0 && personnages.map((perso, index) => (
-  <View key={perso.id || index} style={styles.personnageContainer}>
-    <Text style={styles.sectionTitle}>Fiche du personnage #{index + 1}</Text>
-    <Text style={styles.personnageTexte}>Nom : {perso.nomPersonnage}</Text>
-    <Text style={styles.personnageTexte}>Classe: {nomClasses[perso.classe_id ?? 0]}</Text>
-    <Text style={styles.personnageTexte}>Race: {nomRaces[perso.race_id ?? 0]}</Text>
-    <Text style={styles.personnageTexte}>Âge : {perso.age} ans</Text>
-    <Text style={styles.personnageTexte}>Sexe : {perso.sexe}</Text>
-    <Text style={styles.personnageTexte}>Taille : {perso.taille}</Text>
-    <Text style={styles.personnageTexte}>Poids : {perso.poids}</Text>
-    <Text style={styles.personnageTexte}>Niveau : {perso.niveau}</Text>
-    <Text style={styles.personnageTexte}>Alignement : {perso.alignement}</Text>
-    <Text style={styles.personnageTexte}>PV : {perso.pvActuel} / {perso.pvMax}</Text>
-    <Text style={styles.personnageTexte}>Attaque : {perso.attaque}</Text>
-    <Text style={styles.personnageTexte}>Sorts : {perso.sort}</Text>
-    <Text style={styles.personnageTexte}>Équipement : {perso.equipement}</Text>
-    <Text style={styles.personnageTexte}>Apparence : {perso.apparence}</Text>
-    <Text style={styles.personnageTexte}>Histoire : {perso.histoire}</Text>
-    <Text style={styles.personnageTexte}>Alliés : {perso.alies}</Text>
-    <Text style={styles.personnageTexte}>Trésor : {perso.tresor}</Text>
-    <Text style={styles.personnageTexte}>Notes : {perso.notes}</Text>
-    <Text style={styles.personnageTexte}>Notes sur les sorts : {perso.notesSort}</Text>
-  </View>
-))}
 
-  </ScrollView>
-);
+      <View style={styles.dropdownContainer}>
+        <Dropdown
+          style={[
+            styles.dropdown,
+            themeActuel === 'sombre' && { backgroundColor: '#333', borderColor: '#666' },
+          ]}
+         containerStyle={{ backgroundColor: themeActuel === 'sombre' ? 'darkgray' : 'lightgray' }}
+          itemTextStyle={{ color: 'black'  }}
+          placeholderStyle={{ color: themeActuel === 'sombre' ? 'white' : '#999' }}
+          selectedTextStyle={{ color: themeActuel === 'sombre' ? 'lightgray' : '#000' }}
+          data={raceDropdownData}
+          labelField="label"
+          valueField="value"
+          placeholder="-- Choisir une race --"
+          value={selectedRace}
+          onChange={(item) => {
+            setSelectedRace(item.value);
+            setSelectedRaceValeur({ id: item.value, name: item.label });
+          }}
+
+        />
+
+      </View>
+
+      <Text style={[styles.baseText, themeActuel === 'sombre' && { color: 'white' }]}>
+        Sélectionne ta Classe :
+      </Text>
+
+      <View style={styles.dropdownContainer}>
+        <Dropdown
+          style={[
+            styles.dropdown,
+            themeActuel === 'sombre' && { backgroundColor: '#333', borderColor: '#666' },
+          ]}
+          containerStyle={{ backgroundColor: themeActuel === 'sombre' ? 'darkgray' : 'lightgray' }}
+          itemTextStyle={{ color: 'black'  }}
+          placeholderStyle={{ color: themeActuel === 'sombre' ? 'white' : '#999' }}
+          selectedTextStyle={{ color: themeActuel === 'sombre' ? 'white' : '#000' }}
+          data={classeDropdownData}
+          labelField="label"
+          valueField="value"
+          placeholder="-- Choisir une classe --"
+          value={selectedClasse}
+          onChange={(item) => {
+            // Mettre à jour la valeur sélectionnée pour le dropdown
+            setSelectedClasse(item.value);
+            // Mettre à jour la valeur sélectionnée pour le texte et l'insertion
+            setSelectedClasseValeur({ id: item.value, name: item.label });
+          }}
+        />
+      </View>
+
+      {selectedRace ? (
+        <Text style={styles.selectedRace}>Race choisie : {selectedRaceValeur?.name} (ID: {selectedRaceValeur?.id})</Text>
+      ) : null}
+
+      {selectedClasse ? (
+        <Text style={styles.selectedRace}>Classe choisie : {selectedClasseValeur?.name} (ID: {selectedClasseValeur?.id})</Text>
+      ) : null}
+
+      <View style={styles.buttonContainer}>
+        {listeDes.map((faces) => (
+          <TouchableOpacity
+            key={faces}
+            style={styles.bouton}
+            onPress={() => genererDe(faces)}
+          >
+            <Text style={styles.boutonTexte}>
+              {des[`d${faces}`] !== null ? `${des[`d${faces}`]}` : `d${faces}`}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <TouchableOpacity style={styles.themeButton} onPress={changerTheme}>
+        <Text style={styles.themeButtonText}>
+          Thème actuel : {themeActuel === 'clair' ? 'Clair' : 'Sombre'} — Changer
+        </Text>
+      </TouchableOpacity>
+      {personnages.length > 0 && personnages.map((perso, index) => (
+        <View key={perso.id || index} style={styles.personnageContainer}>
+          <Text style={styles.sectionTitle}>Fiche du personnage #{index + 1}</Text>
+          <Text style={styles.personnageTexte}>Nom : {perso.nomPersonnage}</Text>
+          <Text style={styles.personnageTexte}>Classe: {nomClasses[perso.classe_id ?? 0]}</Text>
+          <Text style={styles.personnageTexte}>Race: {nomRaces[perso.race_id ?? 0]}</Text>
+          <Text style={styles.personnageTexte}>Âge : {perso.age} ans</Text>
+          <Text style={styles.personnageTexte}>Sexe : {perso.sexe}</Text>
+          <Text style={styles.personnageTexte}>Taille : {perso.taille}</Text>
+          <Text style={styles.personnageTexte}>Poids : {perso.poids}</Text>
+          <Text style={styles.personnageTexte}>Niveau : {perso.niveau}</Text>
+          <Text style={styles.personnageTexte}>Alignement : {perso.alignement}</Text>
+          <Text style={styles.personnageTexte}>PV : {perso.pvActuel} / {perso.pvMax}</Text>
+          <Text style={styles.personnageTexte}>Attaque : {perso.attaque}</Text>
+          <Text style={styles.personnageTexte}>Sorts : {perso.sort}</Text>
+          <Text style={styles.personnageTexte}>Équipement : {perso.equipement}</Text>
+          <Text style={styles.personnageTexte}>Apparence : {perso.apparence}</Text>
+          <Text style={styles.personnageTexte}>Histoire : {perso.histoire}</Text>
+          <Text style={styles.personnageTexte}>Alliés : {perso.alies}</Text>
+          <Text style={styles.personnageTexte}>Trésor : {perso.tresor}</Text>
+          <Text style={styles.personnageTexte}>Notes : {perso.notes}</Text>
+          <Text style={styles.personnageTexte}>Notes sur les sorts : {perso.notesSort}</Text>
+        </View>
+      ))}
+
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -428,24 +463,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   personnageContainer: {
-  marginTop: 30,
-  padding: 20,
-  backgroundColor: '#f5f5f5',
-  borderRadius: 12,
-  width: '100%',
-},
-sectionTitle: {
-  fontSize: 20,
-  fontWeight: 'bold',
-  marginBottom: 10,
-  color: '#333',
-  textAlign: 'center',
-},
-personnageTexte: {
-  fontSize: 16,
-  marginVertical: 2,
-  color: '#444',
-},
+    marginTop: 30,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    width: '100%',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+    textAlign: 'center',
+  },
+  personnageTexte: {
+    fontSize: 16,
+    marginVertical: 2,
+    color: '#444',
+  },
+  dropdownContainer: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  dropdown: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
+
 });
 
 export default App;
