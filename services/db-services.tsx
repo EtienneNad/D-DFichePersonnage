@@ -147,7 +147,7 @@ export const ajouterPersonnage = async (db: SQLiteDatabase, mesPersonnages: MesP
 export const modifierPersonnage = async (
   db: SQLiteDatabase,
   id: number | null, nomPersonnage: string, age: number, sexe: string, taille: string, poids: string,
-  classe: number, race: number, niveau: number, alignement: string, pointExp: number, pvMax: number,
+  classe_id: number | null, race_id: number | null, niveau: number, alignement: string, pointExp: number, pvMax: number,
   pvActuel: number, force: number, bonusForce: number, dexterite: number, bonusDexterite: number,
   constitution: number, bonusConstitution: number, intelligence: number, bonusIntelligence: number,
   sagesse: number, bonusSagesse: number, charisme: number, bonusCharisme: number, vitesse: number,
@@ -155,7 +155,7 @@ export const modifierPersonnage = async (
   alies: string, tresor: string, notes: string, notesSort: string
 ) => {
   const updateQuery = `UPDATE ${tablePersonnage} SET
-    nomPersonnage = ?, age = ?, sexe = ?, taille = ?, poids = ?, classe = ?, race = ?, niveau = ?,
+    nomPersonnage = ?, age = ?, sexe = ?, taille = ?, poids = ?, classe_id = ?, race_id = ?, niveau = ?,
     alignement = ?, pointExp = ?, pvMax = ?, pvActuel = ?, force = ?, bonusForce = ?, dexterite = ?, 
     bonusDexterite = ?, constitution = ?, bonusConstitution = ?, intelligence = ?, bonusIntelligence = ?,
     sagesse = ?, bonusSagesse = ?, charisme = ?, bonusCharisme = ?, vitesse = ?, attaque = ?, defense = ?,
@@ -163,7 +163,7 @@ export const modifierPersonnage = async (
   WHERE id = ?`;
 
   await db.executeSql(updateQuery, [
-    nomPersonnage, age, sexe, taille, poids, classe, race, niveau, alignement, pointExp, pvMax,
+    nomPersonnage, age, sexe, taille, poids, classe_id, race_id, niveau, alignement, pointExp, pvMax,
     pvActuel, force, bonusForce, dexterite, bonusDexterite, constitution, bonusConstitution, intelligence,
     bonusIntelligence, sagesse, bonusSagesse, charisme, bonusCharisme, vitesse, attaque, defense, sort,
     equipement, apparence, histoire, alies, tresor, notes, notesSort, id

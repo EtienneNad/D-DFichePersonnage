@@ -1,28 +1,528 @@
-import React, { JSX } from 'react';
+import React, { JSX, useCallback, useEffect, useState } from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Platform,
+  StatusBar,
+  Alert,
+} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import EcranDes from './components/EcranDe'; // adapte le chemin si besoin
+
+import EcranDes from './components/EcranDe';
+import EcranAccueil from './components/EcranAccueil';
+import EcranAjout from './components/EcranAjout';
+import EcranModification from './components/EcranModification';
+import EcranListePersonnage from './components/EcranListePersonnage';
+import EcranInformationPersonnage from './components/EcranInformationPersonnage';
+
+
+import {
+  ajouterTheme,
+  createTablePersonnage,
+  createTableTheme,
+  getDBConnection,
+  getPersonnages,
+  getTheme,
+  modifierTheme,
+  modifierPersonnage,
+  ajouterPersonnage,
+  supprimerPersonnage,
+  ajouterRace,
+  getRaces,
+  createTableRace,
+  createTableClasse,
+  getClasses,
+  ajouterClasse,
+} from './services/db-services';
+import { DNDFicheContexteType, MesClasses, MesPersonnages, MesRaces, MesThemes } from './modeles/ModeleFicheDND';
 
 export type RootStackParamList = {
-  Des: undefined;
+  Accueil: undefined;
+  Des: { theme: string };
+  Ajouter: undefined;
+  Modifier: undefined;
+  ListePersonnage: {theme: string};
+  InformationPersonnage: undefined;
 };
+
+export const FicheDNDContexte = React.createContext<DNDFicheContexteType | null>(null);
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
+  const [theme, setTheme] = useState<MesThemes[]>([]);
+  const [personnages, setPersonnages] = useState<MesPersonnages[]>([]);
+  const [newTheme, setNewTheme] = useState('');
+  const [setThemes] = useState<string>('');
+  
+  const [nomRaces, setNomsRaces] = useState<{ [id: number]: string }>({});
+  const [nomClasses, setNomsClasses] = useState<{ [id: number]: string }>({});
+  const [selectedRace, setSelectedRace] = useState<string>('');
+  const [selectedClasse, setSelectedClasse] = useState<string>('');
+  const [selectedRaceValeur, setSelectedRaceValeur] = useState<{ id: number; name: string } | null>(null);
+  const [selectedClasseValeur, setSelectedClasseValeur] = useState<{ id: number; name: string } | null>(null);
+  const [race, setRace] = useState<MesRaces[]>([]);
+  const [classe, setClasse] = useState<MesClasses[]>([]);
+  const [setRaces] = useState<string>('');
+  const [setClasses] = useState<string>('');
+  const [newRace, setNewRace] = useState<string>('');
+  const [newClasse, setNewClasse] = useState<string>('');
+  
+  const [newNomPersonnage, setNewNomPersonnage] = useState<string>('');
+  const [newClasse_id, setNewClasse_id] = useState<number>(0);
+  const [newRace_id, setNewRace_id] = useState<number>(0);
+  const [newNiveau, setNewNiveau] = useState<number>(0);
+  const [newPvMax, setNewPvMax] = useState<number>(0);
+  const [newPvActuel, setNewPvActuel] = useState<number>(0);
+  const [newForce, setNewForce] = useState<number>(0);
+  const [newBonusForce, setNewBonusForce] = useState<number>(0);
+  const [newDexterite, setNewDexterite] = useState<number>(0);
+  const [newBonusDexterite, setNewBonusDexterite] = useState<number>(0);
+  const [newConstitution, setNewConstitution] = useState<number>(0);
+  const [newBonusConstitution, setNewBonusConstitution] = useState<number>(0);
+  const [newIntelligence, setNewIntelligence] = useState<number>(0);
+  const [newBonusIntelligence, setNewBonusIntelligence] = useState<number>(0);
+  const [newSagesse, setNewSagesse] = useState<number>(0);
+  const [newBonusSagesse, setNewBonusSagesse] = useState<number>(0);
+  const [newCharisme, setNewCharisme] = useState<number>(0);
+  const [newBonusCharisme, setNewBonusCharisme] = useState<number>(0);
+  const [newAge, setNewAge] = useState<number>(0);
+  const [newSexe, setNewSexe] = useState<string>('');
+  const [newTaille, setNewTaille] = useState<string>('');
+  const [newPoids, setNewPoids] = useState<string>('');
+  const [newAlignement, setNewAlignement] = useState<string>('');
+  const [newPointExp, setNewPointExp] = useState<number>(0);
+  const [newAttaque, setNewAttaque] = useState<string>('');
+  const [newDefense, setNewDefense] = useState<number>(0);
+  const [newSort, setNewSort] = useState<string>('');
+  const [newEquipement, setNewEquipement] = useState<string>('');
+  const [newApparence, setNewApparence] = useState<string>('')
+  const [newHistoire, setNewHistoire] = useState<string>('');
+  const [newAlies, setNewAlies] = useState<string>('');
+  const [newTresor, setNewTresor] = useState<string>('');
+  const [newNotes, setNewNotes] = useState<string>('');
+  const [newNotesSort, setNewNotesSort] = useState<string>('');
+  const [newVitesse, setNewVitesse] = useState<number>(0);
+
+
+  const modifierThemes = async (id: number | null, theme: string) => {
+    try {
+      const db = await getDBConnection();
+      await modifierTheme(db, id, theme);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('La modification a échoué');
+    }
+  };
+  const modifierPersonnages = async ( id: number | null, nomPersonnage: string, age: number, sexe: string, taille: string, poids: string, classe_id: number | null, race_id: number | null, niveau: number, alignement: string, pointExp: number, pvMax: number, pvActuel: number, force: number, bonusForce: number, dexterite: number, bonusDexterite: number, constitution: number, bonusConstitution: number, intelligence: number, bonusIntelligence: number, sagesse: number, bonusSagesse: number, charisme: number, bonusCharisme: number, vitesse: number, attaque: string, defense: number, sort: string, equipement: string, apparence: string, histoire: string, alies: string, tresor: string, notes: string, notesSort: string) => {
+    try {
+      const db = await getDBConnection();
+      await modifierPersonnage(db, id, nomPersonnage, age,
+        sexe, taille, poids, classe_id, race_id, niveau, alignement, pointExp, pvMax, pvActuel, force, bonusForce, dexterite, bonusDexterite, constitution, bonusConstitution, intelligence, bonusIntelligence, sagesse, bonusSagesse, charisme, bonusCharisme, vitesse, attaque, defense, sort, equipement, apparence, histoire, alies, tresor, notes, notesSort);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('La modification a échoué');
+    }
+  }
+const ajouterPersonnages = async () => {
+    try {
+      const db = await getDBConnection();
+      const nouveauPersonnage = {
+        id: null,
+        nomPersonnage: newNomPersonnage,
+        age: newAge,
+        sexe: newSexe,
+        taille: newTaille,
+        poids: newPoids,
+        classe_id: newClasse_id,
+        race_id: newRace_id,
+        niveau: newNiveau,
+        alignement: newAlignement,
+        pointExp: newPointExp,
+        pvMax: newPvMax,
+        pvActuel: newPvActuel,
+        force: newForce,
+        bonusForce: newBonusForce,
+        dexterite: newDexterite,
+        bonusDexterite: newBonusDexterite,
+        constitution: newConstitution,
+        bonusConstitution: newBonusConstitution,
+        intelligence: newIntelligence,
+        bonusIntelligence: newBonusIntelligence,
+        sagesse: newSagesse,
+        bonusSagesse: newBonusSagesse,
+        charisme: newCharisme,
+        bonusCharisme: newBonusCharisme,
+        vitesse: newVitesse,
+        attaque: newAttaque,
+        defense: newDefense,
+        sort: newSort,
+        equipement: newEquipement,
+        apparence: newApparence,
+        histoire: newHistoire,
+        alies: newAlies,
+        tresor: newTresor,
+        notes: newNotes,
+        notesSort: newNotesSort,
+      };
+      setPersonnages([...personnages, nouveauPersonnage]);
+      await ajouterPersonnage(db, [nouveauPersonnage]);
+
+      // Clear the input field
+      setNewNomPersonnage('');
+      setNewAge(0);
+      setNewSexe('');
+      setNewTaille('');
+      setNewPoids('');
+      setNewClasse_id(0);
+      setNewRace_id(0);
+      setNewNiveau(0);
+      setNewAlignement('');
+      setNewPointExp(0);
+      setNewPvMax(0);
+      setNewPvActuel(0);
+      setNewForce(0);
+      setNewBonusForce(0);
+      setNewDexterite(0);
+      setNewBonusDexterite(0);
+      setNewConstitution(0);
+      setNewBonusConstitution(0);
+      setNewIntelligence(0);
+      setNewBonusIntelligence(0);
+      setNewSagesse(0);
+      setNewBonusSagesse(0);
+      setNewCharisme(0);
+      setNewBonusCharisme(0);
+      setNewVitesse(0);
+      setNewAttaque('');
+      setNewDefense(0);
+      setNewSort('');
+      setNewEquipement('');
+      setNewApparence('');
+      setNewHistoire('');
+      setNewAlies('');
+      setNewTresor('');
+      setNewNotes('');
+      setNewNotesSort('');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const loadPersonnage = useCallback(async () => {
+    try {
+  const initPersonnages = [
+        {
+          id: 1,
+          nomPersonnage: "Thalor Ombrevent",
+          age: 120,
+          sexe: "Masculin",
+          taille: "1m78",
+          poids: "65 kg",
+          classe_id: 2, // Mage
+          race_id: 2, // Elfe
+          niveau: 5,
+          alignement: "Neutre bon",
+          pointExp: 6500,
+          pvMax: 28,
+          pvActuel: 22,
+          force: 10,
+          bonusForce: 0,
+          dexterite: 16,
+          bonusDexterite: 3,
+          constitution: 14,
+          bonusConstitution: 2,
+          intelligence: 18,
+          bonusIntelligence: 4,
+          sagesse: 13,
+          bonusSagesse: 1,
+          charisme: 11,
+          bonusCharisme: 0,
+          vitesse: 9,
+          attaque: "Bâton magique (+4) / Rayon de givre",
+          defense: 13,
+          sort: "Projectiles magiques, Bouclier, Invisibilité, Rayon affaiblissant",
+          equipement: "Bâton gravé, Robe d’archimage, Livre de sorts, Composantes magiques",
+          apparence: "Un elfe élancé aux longs cheveux argentés et aux yeux violets perçants.",
+          histoire: "Thalor a étudié à la Tour de Silvanost, fuyant la guerre pour se consacrer à la connaissance des arcanes. Il cache un passé trouble lié à une magie interdite.",
+          alies: "Maître Elorien, Lila la rôdeuse, un golem de pierre nommé 'Roc'.",
+          tresor: "Pendentif d’absorption magique, 200 pièces d’or, gemme bleue",
+          notes: "Ne fait pas confiance aux nains. A peur de perdre le contrôle de ses pouvoirs.",
+          notesSort: "Toujours garder un emplacement pour 'Bouclier' prêt en cas d'embuscade."
+        },
+        {
+          id: 2,
+          nomPersonnage: "Thalor Ombrevent",
+          age: 120,
+          sexe: "Masculin",
+          taille: "1m78",
+          poids: "65 kg",
+          classe_id: 2, // Mage
+          race_id: 2, // Elfe
+          niveau: 5,
+          alignement: "Neutre bon",
+          pointExp: 6500,
+          pvMax: 28,
+          pvActuel: 22,
+          force: 10,
+          bonusForce: 0,
+          dexterite: 16,
+          bonusDexterite: 3,
+          constitution: 14,
+          bonusConstitution: 2,
+          intelligence: 18,
+          bonusIntelligence: 4,
+          sagesse: 13,
+          bonusSagesse: 1,
+          charisme: 11,
+          bonusCharisme: 0,
+          vitesse: 9,
+          attaque: "Bâton magique (+4) / Rayon de givre",
+          defense: 13,
+          sort: "Projectiles magiques, Bouclier, Invisibilité, Rayon affaiblissant",
+          equipement: "Bâton gravé, Robe d’archimage, Livre de sorts, Composantes magiques",
+          apparence: "Un elfe élancé aux longs cheveux argentés et aux yeux violets perçants.",
+          histoire: "Thalor a étudié à la Tour de Silvanost, fuyant la guerre pour se consacrer à la connaissance des arcanes. Il cache un passé trouble lié à une magie interdite.",
+          alies: "Maître Elorien, Lila la rôdeuse, un golem de pierre nommé 'Roc'.",
+          tresor: "Pendentif d’absorption magique, 200 pièces d’or, gemme bleue",
+          notes: "Ne fait pas confiance aux nains. A peur de perdre le contrôle de ses pouvoirs.",
+          notesSort: "Toujours garder un emplacement pour 'Bouclier' prêt en cas d'embuscade."
+        }
+
+      ];
+      const db = await getDBConnection();
+      await createTablePersonnage(db);
+      const personnagesDB = await getPersonnages(db);
+      if (personnagesDB.length) {
+        setPersonnages(personnagesDB);
+      } else {
+        await ajouterPersonnage(db, initPersonnages);
+        setPersonnages(initPersonnages);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+ 
+  const SupprimerPersonnages = async (id: number | null) => {
+    try {
+      const db = await getDBConnection();
+      await supprimerPersonnage(db, id);
+      setPersonnages(personnages.filter((personnage) => personnage.id !== id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+    const loadRace = useCallback(async () => {
+    try {
+      const initRaces = [
+        { id: 1, race: 'Humain' },
+        { id: 2, race: 'Elfe' },
+        { id: 3, race: 'Nain' },
+      ];
+      const db = await getDBConnection();
+      await createTableRace(db);
+      const racesDB = await getRaces(db);
+      if (racesDB.length) setRace(racesDB);
+      else {
+        await ajouterRace(db, initRaces);
+        setRace(initRaces);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const loadClasse = useCallback(async () => {
+    try {
+      const initClasse = [
+        { id: 1, classe: 'Guerrier' },
+        { id: 2, classe: 'Mage' },
+        { id: 3, classe: 'Druide' },
+      ];
+      const db = await getDBConnection();
+      await createTableClasse(db);
+      const classesDB = await getClasses(db);
+      if (classesDB.length) setClasse(classesDB);
+      else {
+        await ajouterClasse(db, initClasse);
+        setClasse(initClasse);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+  const loadTheme = useCallback(async () => {
+    try {
+      const initTheme = [{ id: 0, theme: 'clair' }];
+      const db = await getDBConnection();
+      await createTableTheme(db);
+      const themesDB = await getTheme(db);
+      if (themesDB.length) setTheme(themesDB);
+      else {
+        await ajouterTheme(db, initTheme);
+        setTheme(initTheme);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTheme();
+  }, [loadTheme]);
+
+  const valeurs: DNDFicheContexteType  = {
+    //Contexte pour les thèmes
+    themes: theme,
+    setThemes,
+    newTheme,
+    setNewTheme,
+    modifierTheme: modifierThemes,
+    loadTheme,
+
+    //Contexte pour les races
+    races: race,
+    setRaces,
+    nomRaces,
+    setNomsRaces,
+    selectedRace,
+    setSelectedRace,
+    selectedRaceValeur,
+    setSelectedRaceValeur,
+    newRace,
+    setNewRaces: setNewRace,
+    loadRace,
+
+    //Contexte pour les classes
+    classes: classe,
+    setClasses,
+    newClasse,
+    setNewClasse,
+    nomClasses,
+    setNomsClasses,
+    selectedClasse,
+    setSelectedClasse,
+    selectedClasseValeur,
+    setSelectedClasseValeur,
+    loadClasse,
+    //Contexte pour les personnage
+    personnages: personnages,
+    setMesPersonnages: setPersonnages,
+    newNomPersonnage,
+    setNewNomPersonnage,
+    newClasse_id,
+    setNewClasse_id,
+    newRace_id,
+    setNewRace_id,
+    newNiveau,
+    setNewNiveau,
+    newPvMax,
+    setNewPvMax,
+    newPvActuel,
+    setNewPvActuel,
+    newForce,
+    setNewForce,
+    newBonusForce,
+    setNewBonusForce,
+    newDexterite,
+    setNewDexterite,
+    newBonusDexterite,
+    setNewBonusDexterite,
+    newConstitution,
+    setNewConstitution,
+    newBonusConstitution,
+    setNewBonusConstitution,
+    newIntelligence,
+    setNewIntelligence,
+    newBonusIntelligence,
+    setNewBonusIntelligence,
+    newSagesse,
+    setNewSagesse,
+    newBonusSagesse,
+    setNewBonusSagesse,
+    newCharisme,
+    setNewCharisme,
+    newBonusCharisme,
+    setNewBonusCharisme,
+    newAge,
+    setNewAge,
+    newSexe,
+    setNewSexe,
+    newTaille,
+    setNewTaille,
+    newPoids,
+    setNewPoids,
+    newAlignement,
+    setNewAlignement,
+    newPointExp,
+    setNewPointExp,
+    newAttaque,
+    setNewAttaque,
+    newDefense,
+    setNewDefense,
+    newSort,
+    setNewSort,
+    newEquipement,
+    setNewEquipement,
+    newApparence,
+    setNewApparence,
+    newHistoire,
+    setNewHistoire,
+    newAlies,
+    setNewAlies,
+    newTresor,
+    setNewTresor,
+    newNotes,
+    setNewNotes,
+    newNotesSort,
+    setNewNotesSort,
+    newVitesse,
+    setNewVitesse,
+    loadPersonnage,
+    modifierPersonnage: modifierPersonnages,
+    ajouterPersonnage: ajouterPersonnages,
+    supprimerPersonnage: SupprimerPersonnages,
+    
+  };
+  useEffect(() => {
+  const init = async () => {
+    await loadRace();
+    await loadTheme();
+    await loadClasse();
+    await loadPersonnage();
+  };
+  init();
+}, [loadRace, loadTheme, loadClasse, loadPersonnage]);
+
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Des">
-          <Stack.Screen name="Des" component={EcranDes} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <SafeAreaView style={styles.safeArea}>
+      <FicheDNDContexte.Provider value={valeurs}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Accueil">
+            <Stack.Screen name="Accueil" component={EcranAccueil} />
+            <Stack.Screen name="Des" component={EcranDes} options={{ title: 'Dés'}} initialParams={{ theme: '' }} />
+            <Stack.Screen name="Ajouter" component={EcranAjout} options={{ title: 'Ajouter un personnage' }} />
+            <Stack.Screen name="Modifier" component={EcranModification} options={{ title: 'Modifier un personnage' }} />
+            <Stack.Screen name="ListePersonnage" component={EcranListePersonnage} options={{ title: 'Liste des personnages' }} initialParams={{ theme: '' }} />
+            <Stack.Screen name="InformationPersonnage" component={EcranInformationPersonnage} options={{ title: 'Mes informations' }} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </FicheDNDContexte.Provider>
+    </SafeAreaView>
   );
 }
 
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    paddingTop: 5,
+    backgroundColor: 'white', // ajustable selon thème
+  },
+});
+
 export default App;
+
 
 
 // import React, { JSX, useCallback, useEffect, useState } from 'react';
@@ -76,7 +576,7 @@ export default App;
 //   const [selectedClasseValeur, setSelectedClasseValeur] = useState<{ id: number; name: string } | null>(null);
 //   const [race, setRaces] = useState<MesRaces[]>([]);
 //   const [theme, setTheme] = useState<MesThemes[]>([]);
-//   const [personnages, setPersonnages] = useState<MesPersonnages[]>([]);
+//   
 //   const [classe, setClasse] = useState<MesClasses[]>([]);
 
 //   const raceDropdownData = race.map((item) => ({ label: item.race, value: item.id }));
@@ -138,16 +638,7 @@ export default App;
 //     }
 //   }, []);
 
-//   const loadPersonnage = useCallback(async () => {
-//     try {
-//       const db = await getDBConnection();
-//       await createTablePersonnage(db);
-//       const personnagesDB = await getPersonnages(db);
-//       if (personnagesDB.length) setPersonnages(personnagesDB);
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   }, []);
+//   
 
 //   useEffect(() => {
 //     const init = async () => {

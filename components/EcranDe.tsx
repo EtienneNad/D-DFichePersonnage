@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import { RootStackParamList, FicheDNDContexte } from '../App';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { DNDFicheContexteType } from '../modeles/ModeleFicheDND';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Des'>;
 
-const EcranDe = ({ navigation }: Props) => {
+const EcranDe = ({}: Props) => {
+  const { themes } = useContext(FicheDNDContexte) as DNDFicheContexteType;
+  const themeActuel = themes[0]?.theme ?? 'clair';
+
+  // Couleurs dynamiques
+  const couleurs = {
+    background: themeActuel === 'clair' ? '#ffffff' : '#121212',
+    texte: themeActuel === 'clair' ? '#000000' : '#ffffff',
+    bouton: themeActuel === 'clair' ? '#007AFF' : '#BB86FC',
+  };
+
   const [des, setDes] = useState<{ [key: string]: number | null }>({
     d20: null,
     d12: null,
@@ -23,22 +35,29 @@ const EcranDe = ({ navigation }: Props) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.titre}>Lancer de dés</Text>
-      <View style={styles.buttonContainer}>
-        {listeDes.map((faces) => (
-          <TouchableOpacity
-            key={faces}
-            style={styles.bouton}
-            onPress={() => genererDe(faces)}
-          >
-            <Text style={styles.boutonTexte}>
-              {des[`d${faces}`] !== null ? `${des[`d${faces}`]}` : `d${faces}`}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </ScrollView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: couleurs.background }}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: couleurs.background },
+        ]}
+      >
+        <Text style={[styles.titre, { color: couleurs.texte }]}>Lancer de dés</Text>
+        <View style={styles.buttonContainer}>
+          {listeDes.map((faces) => (
+            <TouchableOpacity
+              key={faces}
+              style={[styles.bouton, { backgroundColor: couleurs.bouton }]}
+              onPress={() => genererDe(faces)}
+            >
+              <Text style={styles.boutonTexte}>
+                {des[`d${faces}`] !== null ? `${des[`d${faces}`]}` : `d${faces}`}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -48,7 +67,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
   },
   titre: {
     fontSize: 28,
@@ -61,7 +79,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bouton: {
-    backgroundColor: '#007AFF',
     padding: 20,
     borderRadius: 12,
     margin: 10,
