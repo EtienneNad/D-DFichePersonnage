@@ -195,19 +195,22 @@ function App(): JSX.Element {
           notes: "Ne fait pas confiance aux nains. A peur de perdre le contrôle de ses pouvoirs.",
           notesSort: "Toujours garder un emplacement pour 'Bouclier' prêt en cas d'embuscade."
         },
+
         {
-          id: 2, nomPersonnage: "Thalor Ombrevent", age: 120, sexe: "Masculin", taille: "1m78", poids: "65 kg",
-          classe_id: 2, race_id: 2, niveau: 5, alignement: "Neutre bon", pointExpAcquis: 6500, pointExpObjectif: 7000, pvMax: 28, pvActuel: 22,
-          force: 10, bonusForce: 0, dexterite: 16, bonusDexterite: 3, constitution: 14, bonusConstitution: 2, intelligence: 18, bonusIntelligence: 4,
-          sagesse: 13, bonusSagesse: 1, charisme: 11, bonusCharisme: 0, vitesse: 9, attaque: "Bâton magique (+4) / Rayon de givre", defense: 13,
-          sort: "Projectiles magiques, Bouclier, Invisibilité, Rayon affaiblissant", equipement: "Bâton gravé, Robe d’archimage, Livre de sorts, Composantes magiques",
-          apparence: "Un elfe élancé aux longs cheveux argentés et aux yeux violets perçants.",
-          histoire: "Thalor a étudié à la Tour de Silvanost, fuyant la guerre pour se consacrer à la connaissance des arcanes. Il cache un passé trouble lié à une magie interdite.",
-          alies: "Maître Elorien, Lila la rôdeuse, un golem de pierre nommé 'Roc'.",
-          tresor: "Pendentif d’absorption magique, 200 pièces d’or, gemme bleue",
-          notes: "Ne fait pas confiance aux nains. A peur de perdre le contrôle de ses pouvoirs.",
-          notesSort: "Toujours garder un emplacement pour 'Bouclier' prêt en cas d'embuscade."
+          id: 2, nomPersonnage: "Kaelen Forgebrise", age: 42, sexe: "Masculin", taille: "1m45", poids: "85 kg", classe_id: 1, race_id: 3,
+          niveau: 4, alignement: "Loyal Neutre", pointExpAcquis: 4100, pointExpObjectif: 5000, pvMax: 36, pvActuel: 36, force: 17, bonusForce: 3,
+          dexterite: 12, bonusDexterite: 1, constitution: 16, bonusConstitution: 3, intelligence: 10, bonusIntelligence: 0, sagesse: 11, bonusSagesse: 0,
+          charisme: 9, bonusCharisme: -1, vitesse: 7, attaque: "Hache de guerre (+5), Bouclier, Coup de bouclier", defense: 17,
+          sort: "", equipement: "Armure de plaques, Hache de guerre naine, Bouclier en acier gravé, Talisman d’honneur",
+          apparence: "Un nain trapu au regard dur, avec une barbe tressée ornée d’anneaux de clan, et des cicatrices visibles sur les bras.",
+          histoire: "Kaelen est un ancien garde royal du royaume de Grunndak, tombé en disgrâce après avoir refusé d'obéir à un ordre injuste. Depuis, il parcourt le monde pour restaurer son honneur.",
+          alies: "Darra Forgebraise (sa sœur forgeronne), un ancien mage du royaume, et un griffon blessé qu’il a sauvé.",
+          tresor: "Anneau de résistance au feu, 150 pièces d’or, hache ancienne de son clan",
+          notes: "Doute constamment de ses choix, évite les conflits politiques. Protège les faibles sans hésitation.",
+          notesSort: "Aucun sort – guerrier pur. Préfère les actions directes aux plans complexes."
         }
+
+
 
       ];
       const db = await recupererDBConnection();
@@ -369,8 +372,8 @@ function App(): JSX.Element {
     <SafeAreaView style={styles.safeArea}>
       <FicheDNDContexte.Provider value={valeurs}>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Accueil"> 
-            <Stack.Screen name="Accueil" component={EcranAccueil} />
+          <Stack.Navigator initialRouteName="Accueil">
+            <Stack.Screen name="Accueil" component={EcranAccueil} options={{ title: '' }} />
             <Stack.Screen name="Des" component={EcranDes} options={{ title: 'Dés' }} initialParams={{ theme: '' }} />
             <Stack.Screen name="Ajouter" component={EcranAjout} options={{ title: 'Ajouter un personnage' }} initialParams={{ theme: '' }} />
             <Stack.Screen name="Modifier" component={EcranModification} options={{ title: 'Modifier un personnage' }} initialParams={{

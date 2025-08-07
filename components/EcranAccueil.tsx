@@ -51,7 +51,7 @@ const EcranAccueil = ({ navigation }: Props) => {
         >
             {/* Affichage du texte du bouton selon le thème */}
           <Text style={styles.boutonTexte}>
-            {themeActuel === 'clair' ? 'clair' : 'sombre'}
+            Thème: {themeActuel === 'sombre' ? 'clair' : 'sombre'}
           </Text>
         </TouchableOpacity>
         {/* Navigation vers la page de dés */}
@@ -74,7 +74,7 @@ const EcranAccueil = ({ navigation }: Props) => {
           style={[styles.bouton, { backgroundColor: couleurs.bouton }]}
           onPress={() => navigation.navigate('ListePersonnage', { theme: themeActuel })}
         >
-          <Text style={styles.boutonTexte}>📜Fiche de personnage</Text>
+          <Text style={styles.boutonTexte}>📜Liste des personnages</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
