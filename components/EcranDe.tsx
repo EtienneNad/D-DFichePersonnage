@@ -1,3 +1,4 @@
+// components/EcranDe.tsx
 import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -5,9 +6,13 @@ import { RootStackParamList, FicheDNDContexte } from '../App';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DNDFicheContexteType } from '../modeles/ModeleFicheDND';
 
+// Type pour les propriétés du composant utilisé pour la navigation et les paramètres de route
 type Props = NativeStackScreenProps<RootStackParamList, 'Des'>;
 
-const EcranDe = ({}: Props) => {
+//Page permettant de lancer des dés
+const EcranDe = ({ }: Props) => {
+  // Récupération des paramètres de la route
+
   const { themes } = useContext(FicheDNDContexte) as DNDFicheContexteType;
   const themeActuel = themes[0]?.theme ?? 'clair';
 
@@ -18,22 +23,22 @@ const EcranDe = ({}: Props) => {
     bouton: themeActuel === 'clair' ? '#007AFF' : '#BB86FC',
   };
 
+  // État pour stocker les valeurs des dés
   const [des, setDes] = useState<{ [key: string]: number | null }>({
-    d20: null,
-    d12: null,
-    d10: null,
-    d8: null,
-    d6: null,
-    d4: null,
+    d20: null, d12: null, d10: null, d8: null, d6: null, d4: null,
   });
 
+  // Liste des types de dés disponibles
   const listeDes = [20, 12, 10, 8, 6, 4];
 
+  // Fonction pour générer une valeur aléatoire pour un dé donné
   const genererDe = (faces: number) => {
+    // Génération de la valeur aléatoire
     const valeur = Math.floor(Math.random() * faces) + 1;
     setDes((prev) => ({ ...prev, [`d${faces}`]: valeur }));
   };
 
+  // Rendu du composant EcranDe
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: couleurs.background }}>
       <ScrollView
@@ -44,6 +49,7 @@ const EcranDe = ({}: Props) => {
       >
         <Text style={[styles.titre, { color: couleurs.texte }]}>Lancer de dés</Text>
         <View style={styles.buttonContainer}>
+          {/* Boutons pour chaque type de dé */}
           {listeDes.map((faces) => (
             <TouchableOpacity
               key={faces}
@@ -51,7 +57,7 @@ const EcranDe = ({}: Props) => {
               onPress={() => genererDe(faces)}
             >
               <Text style={styles.boutonTexte}>
-                {des[`d${faces}`] !== null ? `${des[`d${faces}`]}` : `d${faces}`}
+                {des[`🎲${faces}`] !== null ? `${des[`🎲${faces}`]}` : `🎲${faces}`}
               </Text>
             </TouchableOpacity>
           ))}
@@ -60,7 +66,7 @@ const EcranDe = ({}: Props) => {
     </SafeAreaView>
   );
 };
-
+// Styles pour le composant EcranDe
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

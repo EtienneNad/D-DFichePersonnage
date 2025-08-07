@@ -79,7 +79,7 @@ android {
 
     namespace "com.dndfichepersonnage"
     defaultConfig {
-        applicationId "com.dndfichepersonnage"
+        applicationId "com.etienne.dnd"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -16,7 +16,7 @@ export interface MesThemes {
 }
 // Interface pour la gestion des personnages dans l'application D&D
 export interface MesPersonnages {
-    id: number | null;
+ id: number | null;   
     nomPersonnage: string;
     age: number;
     sexe: string;
@@ -26,7 +26,8 @@ export interface MesPersonnages {
     race_id: number | null;
     niveau: number;
     alignement: string;
-    pointExp: number;
+    pointExpAcquis: number;
+    pointExpObjectif: number;
     pvMax: number;
     pvActuel: number;
     force: number;
@@ -61,19 +62,19 @@ export type DNDFicheContexteType = {
     themes: MesThemes[];
     setThemes: string;
     modifierTheme: (id: number | null, theme: string) => void;
-    newTheme: string;
-    setNewTheme: (newTheme: string) => void;
+    nouveauTheme: string;
+    setNouveauTheme: (nouveauTheme: string) => void;
     loadTheme(): void;
 
     // Contexte pour les classes  
     classes: MesClasses[];
     setClasses: string;
-    newClasse: string;
+    nouveauClasse: string;
     selectedClasse: string;
     setSelectedClasse: (classe: string) => void;
     nomClasses: { [id: number]: string };
     setNomsClasses: (classes: { [id: number]: string }) => void;
-    setNewClasse: (newClasse: string) => void;
+    setNouveauClasse: (nouveauClasse: string) => void;
     selectedClasseValeur: { id: number; name: string } | null;
     setSelectedClasseValeur: (classe: { id: number; name: string } | null) => void;
     loadClasse(): void;
@@ -87,8 +88,8 @@ export type DNDFicheContexteType = {
     setSelectedRaceValeur: (race: { id: number; name: string } | null) => void;
     races: MesRaces[];
     setRaces: string;
-    newRace: string;
-    setNewRaces: (newRace: string) => void;
+    nouveauRace: string;
+    setNouveauRaces: (nouveauRace: string) => void;
     loadRace(): void;
 
     // Contexte pour les personnages
@@ -106,7 +107,8 @@ export type DNDFicheContexteType = {
         race_id: number | null,
         niveau: number,
         alignement: string,
-        pointExp: number,
+        pointExpAcquis: number,
+        pointExpObjectif: number,
         pvMax: number,
         pvActuel: number,
         force: number,
@@ -134,75 +136,77 @@ export type DNDFicheContexteType = {
         notesSort: string,
     ) => void;
     supprimerPersonnage: (id: number | null) => void;
-    newNomPersonnage: string;
-    setNewNomPersonnage: (newNomPersonnage: string) => void;
-    newAge: number;
-    setNewAge: (newAge: number) => void;
-    newSexe: string;
-    setNewSexe: (newSexe: string) => void;
-    newTaille: string;
-    setNewTaille: (newTaille: string) => void;
-    newPoids: string;
-    setNewPoids: (newPoids: string) => void;
-    newClasse_id: number;
-    setNewClasse_id: (newClasse_id: number) => void;
-    newRace_id: number;
-    setNewRace_id: (newRace_id: number) => void;
-    newNiveau: number;
-    setNewNiveau: (newNiveau: number) => void;
-    newAlignement: string;
-    setNewAlignement: (newAlignement: string) => void;
-    newPointExp: number;
-    setNewPointExp: (newPointExp: number) => void;
-    newPvMax: number;
-    setNewPvMax: (newPvMax: number) => void;
-    newPvActuel: number;
-    setNewPvActuel: (newPvActuel: number) => void;
-    newForce: number;
-    setNewForce: (newForce: number) => void;
-    newBonusForce: number;
-    setNewBonusForce: (newBonusForce: number) => void;
-    newDexterite: number;
-    setNewDexterite: (newDexterite: number) => void;
-    newBonusDexterite: number;
-    setNewBonusDexterite: (newBonusDexterite: number) => void;
-    newConstitution: number;
-    setNewConstitution: (newConstitution: number) => void;
-    newBonusConstitution: number;
-    setNewBonusConstitution: (newBonusConstitution: number) => void;
-    newIntelligence: number;
-    setNewIntelligence: (newIntelligence: number) => void;
-    newBonusIntelligence: number;
-    setNewBonusIntelligence: (newBonusIntelligence: number) => void;
-    newSagesse: number;
-    setNewSagesse: (newSagesse: number) => void;
-    newBonusSagesse: number;
-    setNewBonusSagesse: (newBonusSagesse: number) => void
-    newCharisme: number;
-    setNewCharisme: (newCharisme: number) => void;
-    newBonusCharisme: number;
-    setNewBonusCharisme: (newBonusCharisme: number) => void;
-    newVitesse: number;
-    setNewVitesse: (newVitesse: number) => void;
-    newAttaque: string;
-    setNewAttaque: (newAttaque: string) => void;
-    newDefense: number;
-    setNewDefense: (newDefense: number) => void;
-    newSort: string;
-    setNewSort: (newSort: string) => void;
-    newEquipement: string;
-    setNewEquipement: (newEquipement: string) => void;
-    newApparence: string;
-    setNewApparence: (newApparence: string) => void;
-    newHistoire: string;
-    setNewHistoire: (newHistoire: string) => void;
-    newAlies: string;
-    setNewAlies: (newAlies: string) => void;
-    newTresor: string;
-    setNewTresor: (newTresor: string) => void;
-    newNotes: string;
-    setNewNotes: (newNotes: string) => void;
-    newNotesSort: string;
-    setNewNotesSort: (newNotesSort: string) => void;
+    nouveauNomPersonnage: string;
+    setNouveauNomPersonnage: (nouveauNomPersonnage: string) => void;
+    nouveauAge: number;
+    setNouveauAge: (nouveauAge: number) => void;
+    nouveauSexe: string;
+    setNouveauSexe: (nouveauSexe: string) => void;
+    nouveauTaille: string;
+    setNouveauTaille: (nouveauTaille: string) => void;
+    nouveauPoids: string;
+    setNouveauPoids: (nouveauPoids: string) => void;
+    nouveauClasse_id: number;
+    setNouveauClasse_id: (nouveauClasse_id: number) => void;
+    nouveauRace_id: number;
+    setNouveauRace_id: (nouveauRace_id: number) => void;
+    nouveauNiveau: number;
+    setNouveauNiveau: (nouveauNiveau: number) => void;
+    nouveauAlignement: string;
+    setNouveauAlignement: (nouveauAlignement: string) => void;
+    nouveauPointExperianceAcquis: number;
+    setNouveauPointExperianceAcquis: (nouveauPointExperianceAcquis: number) => void;
+    nouveauPointExpObjectif: number;
+    setNouveauPointExpObjectif: (nouveauPointExpObjectif: number) => void;
+    nouveauPvMax: number;
+    setNouveauPvMax: (nouveauPvMax: number) => void;
+    nouveauPvActuel: number;
+    setNouveauPvActuel: (nouveauPvActuel: number) => void;
+    nouveauForce: number;
+    setNouveauForce: (nouveauForce: number) => void;
+    nouveauBonusForce: number;
+    setNouveauBonusForce: (nouveauBonusForce: number) => void;
+    nouveauDexterite: number;
+    setNouveauDexterite: (nouveauDexterite: number) => void;
+    nouveauBonusDexterite: number;
+    setNouveauBonusDexterite: (nouveauBonusDexterite: number) => void;
+    nouveauConstitution: number;
+    setNouveauConstitution: (nouveauConstitution: number) => void;
+    nouveauBonusConstitution: number;
+    setNouveauBonusConstitution: (nouveauBonusConstitution: number) => void;
+    nouveauIntelligence: number;
+    setNouveauIntelligence: (nouveauIntelligence: number) => void;
+    nouveauBonusIntelligence: number;
+    setNouveauBonusIntelligence: (nouveauBonusIntelligence: number) => void;
+    nouveauSagesse: number;
+    setNouveauSagesse: (nouveauSagesse: number) => void;
+    nouveauBonusSagesse: number;
+    setNouveauBonusSagesse: (nouveauBonusSagesse: number) => void
+    nouveauCharisme: number;
+    setNouveauCharisme: (nouveauCharisme: number) => void;
+    nouveauBonusCharisme: number;
+    setNouveauBonusCharisme: (nouveauBonusCharisme: number) => void;
+    nouveauVitesse: number;
+    setNouveauVitesse: (nouveauVitesse: number) => void;
+    nouveauAttaque: string;
+    setNouveauAttaque: (nouveauAttaque: string) => void;
+    nouveauDefense: number;
+    setNouveauDefense: (nouveauDefense: number) => void;
+    nouveauSort: string;
+    setNouveauSort: (nouveauSort: string) => void;
+    nouveauEquipement: string;
+    setNouveauEquipement: (nouveauEquipement: string) => void;
+    nouveauApparence: string;
+    setNouveauApparence: (nouveauApparence: string) => void;
+    nouveauHistoire: string;
+    setNouveauHistoire: (nouveauHistoire: string) => void;
+    nouveauAlies: string;
+    setNouveauAlies: (nouveauAlies: string) => void;
+    nouveauTresor: string;
+    setNouveauTresor: (nouveauTresor: string) => void;
+    nouveauNotes: string;
+    setNouveauNotes: (nouveauNotes: string) => void;
+    nouveauNotesSort: string;
+    setNouveauNotesSort: (nouveauNotesSort: string) => void;
     loadPersonnage(): void;
 }

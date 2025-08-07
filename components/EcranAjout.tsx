@@ -1,399 +1,335 @@
-import React, { useContext, useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Alert,
-} from 'react-native';
-import {  DNDFicheContexteType} from '../modeles/ModeleFicheDND';
-
+// components/EcranAjout.tsx
+import React, { useContext, useEffect, useState } from 'react';
+import { Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-
-const EcranAjout = () => {
-  const [newNomPersonnage, setNewNomPersonnage] = useState<string>('');
-const [newClasse, setNewClasse] = useState<number>(0);
-const [newRace, setNewRace] = useState<number>(0);
-const [newNiveau, setNewNiveau] = useState<number>(0);
-const [newPvMax, setNewPvMax] = useState<number>(0);
-const [newPvActuel, setNewPvActuel] = useState<number>(0);
-const [newForce, setNewForce] = useState<number>(0);
-const [newBonusForce, setNewBonusForce] = useState<number>(0);
-const [newDexterite, setNewDexterite] = useState<number>(0);
-const [newBonusDexterite, setNewBonusDexterite] = useState<number>(0);
-const [newConstitution, setNewConstitution] = useState<number>(0);
-const [newBonusConstitution, setNewBonusConstitution] = useState<number>(0);
-const [newIntelligence, setNewIntelligence] = useState<number>(0);
-const [newBonusIntelligence, setNewBonusIntelligence] = useState<number>(0);
-const [newSagesse, setNewSagesse] = useState<number>(0);
-const [newBonusSagesse, setNewBonusSagesse] = useState<number>(0);
-const [newCharisme, setNewCharisme] = useState<number>(0);
-const [newBonusCharisme, setNewBonusCharisme] = useState<number>(0);
-const [newAge, setNewAge] = useState<number>(0);
-const [newSexe, setNewSexe] = useState<string>('');
-const [newTaille, setNewTaille] = useState<string>('');
-const [newPoids, setNewPoids] = useState<string>('');
-const [newAlignement, setNewAlignement] = useState<string>('');
-const [newPointExp, setNewPointExp] = useState<number>(0);
-const [newAttaque, setNewAttaque] = useState<string>('');
-const [newDefense, setNewDefense] = useState<number>(0);
-const [newSort, setNewSort] = useState<string>('');
-const [newEquipement, setNewEquipement] = useState<string>('');
-const [newApparence, setNewApparence] = useState<string>('')
-const [newHistoire, setNewHistoire] = useState<string>('');
-const [newAlies, setNewAlies] = useState<string>('');
-const [newTresor, setNewTresor] = useState<string>('');
-const [newNotes, setNewNotes] = useState<string>('');
-const [newNotesSort, setNewNotesSort] = useState<string>('');
-const [newVitesse, setNewVitesse] = useState<number>(0);
-
-//   const [newVitesse, setNewVitesse] = useState<number>(30);
-//   const {
-//   newNomPersonnage, setNewNomPersonnage,
-//   newClasse, setNewClasse,
-//   newRace, setNewRace,
-//   newNiveau, setNewNiveau,
-//   newPvMax, setNewPvMax,
-//   newPvActuel, setNewPvActuel,
-//   newForce, setNewForce,
-//   newBonusForce, setNewBonusForce,
-//   newDexterite, setNewDexterite,
-//   newBonusDexterite, setNewBonusDexterite,
-//   newConstitution, setNewConstitution,
-//   newBonusConstitution, setNewBonusConstitution,
-//   newIntelligence, setNewIntelligence,
-//   newBonusIntelligence, setNewBonusIntelligence,
-//   newSagesse, setNewSagesse,
-//   newBonusSagesse, setNewBonusSagesse,
-//   newCharisme, setNewCharisme,
-//   newBonusCharisme, setNewBonusCharisme,
-//   newAge, setNewAge,
-//   newSexe, setNewSexe,
-//   newTaille, setNewTaille,
-//   newPoids, setNewPoids,
-//   newAlignement, setNewAlignement,
-//   newPointExp, setNewPointExp,
-//   newAttaque, setNewAttaque,
-//   newDefense, setNewDefense,
-//   newSort, setNewSort,
-//   newEquipement, setNewEquipement,
-//   newApparence, setNewApparence,
-//   newHistoire, setNewHistoire,
-//   newAlies, setNewAlies,
-//   newTresor, setNewTresor,
-//   newNotes, setNewNotes,
-//   newNotesSort, setNewNotesSort,
-//   addMesPersonnages,
-// } = useContext(PersonnageContexte) as unknown as PersonnageContexteType;
+import { Dropdown } from 'react-native-element-dropdown';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { FicheDNDContexte, RootStackParamList } from '../App';
+import { DNDFicheContexteType} from '../modeles/ModeleFicheDND';
 
 
-  const ajouter = () => {
-    if (!newNomPersonnage.trim()) {
-      Alert.alert("Erreur", "Le nom du personnage est requis.");
-      return;
-    }
+// Type pour les propriétés du composant utilisé pour la navigation et les paramètres de route
+type Props = NativeStackScreenProps<RootStackParamList, 'Ajouter'>;
 
-    
-
-   
-    Alert.alert("Succès", "Personnage ajouté !");
-  };
-
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.titre}>Créer un personnage</Text>
-
-      <Text style={styles.label}>Nom</Text>
-      <TextInput
-        style={styles.input}
-        value={newNomPersonnage}
-        onChangeText={setNewNomPersonnage}
-        placeholder="Nom du personnage"
-      />
-
-      <Text style={styles.label}>Classe ID</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        value={String(newClasse)}
-        onChangeText={(val) => setNewClasse(Number(val))}
-        placeholder="ID de la classe"
-      />
-
-      <Text style={styles.label}>Race ID</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        value={String(newRace)}
-        onChangeText={(val) => setNewRace(Number(val))}
-        placeholder="ID de la race"
-      />
-
-      <Text style={styles.label}>Niveau</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        value={String(newNiveau)}
-        onChangeText={(val) => setNewNiveau(Number(val))}
-      />
-
-      <Text style={styles.label}>PV Max</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        value={String(newPvMax)}
-        onChangeText={(val) => setNewPvMax(Number(val))}
-      />
-
-      <Text style={styles.label}>Force</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        value={String(newForce)}
-        onChangeText={(val) => setNewForce(Number(val))}
-      />
-    <Text style={styles.label}>Âge</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newAge)}
-  onChangeText={(val) => setNewAge(Number(val))}
-  placeholder="Âge"
-/>
-
-<Text style={styles.label}>Sexe</Text>
-<TextInput
-  style={styles.input}
-  value={newSexe}
-  onChangeText={setNewSexe}
-  placeholder="Sexe"
-/>
-
-<Text style={styles.label}>Taille</Text>
-<TextInput
-  style={styles.input}
-  value={newTaille}
-  onChangeText={setNewTaille}
-  placeholder="Taille"
-/>
-
-<Text style={styles.label}>Poids</Text>
-<TextInput
-  style={styles.input}
-  value={newPoids}
-  onChangeText={setNewPoids}
-  placeholder="Poids"
-/>
-
-<Text style={styles.label}>Alignement</Text>
-<TextInput
-  style={styles.input}
-  value={newAlignement}
-  onChangeText={setNewAlignement}
-  placeholder="Alignement"
-/>
-
-<Text style={styles.label}>Points d'expérience</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newPointExp)}
-  onChangeText={(val) => setNewPointExp(Number(val))}
-/>
-
-<Text style={styles.label}>PV Actuels</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newPvActuel)}
-  onChangeText={(val) => setNewPvActuel(Number(val))}
-/>
-
-<Text style={styles.label}>Bonus Force</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newBonusForce)}
-  onChangeText={(val) => setNewBonusForce(Number(val))}
-/>
-
-<Text style={styles.label}>Dextérité</Text>
-<TextInput
-  style={styles.input}
-  onChangeText={(val) => setNewDexterite(Number(val))}
-  value={String(newDexterite)}
-  keyboardType="numeric"
+//Page permettant d'ajouter un personnage
+const EcranAjout = ({ route, navigation }: Props) => {
   
-/>
+    // Récupération des paramètres de la route
+  const { theme } = route.params;
 
-<Text style={styles.label}>Bonus Dextérité</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newBonusDexterite)}
-  onChangeText={(val) => setNewBonusDexterite(Number(val))}
-/>
+  // Couleurs dynamiques selon le thème
+  const themeActuel = theme ?? 'clair';
+  const couleurTexte = themeActuel === 'clair' ? '#000' : '#fff';
+  const couleurFond = themeActuel === 'clair' ? '#fff' : '#1c1c1c';
+  const couleurInput = themeActuel === 'clair' ? '#f0f0f0' : '#333';
+  const couleurBordure = themeActuel === 'clair' ? '#ccc' : '#666';
 
-<Text style={styles.label}>Constitution</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newConstitution)}
-  onChangeText={(val) => setNewConstitution(Number(val))}
-/>
 
-<Text style={styles.label}>Bonus Constitution</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newBonusConstitution)}
-  onChangeText={(val) => setNewBonusConstitution(Number(val))}
-/>
+//
+  const {
+    nouveauNomPersonnage, setNouveauNomPersonnage,
+    nouveauClasse_id, setNouveauClasse_id,
+    nouveauRace_id, setNouveauRace_id,
+    nouveauNiveau, setNouveauNiveau,
+    nouveauPvMax, setNouveauPvMax,
+    nouveauPvActuel, setNouveauPvActuel,
+    nouveauForce, setNouveauForce,
+    nouveauVitesse, setNouveauVitesse,
+    nouveauBonusForce, setNouveauBonusForce,
+    nouveauDexterite, setNouveauDexterite,
+    nouveauBonusDexterite, setNouveauBonusDexterite,
+    nouveauConstitution, setNouveauConstitution,
+    nouveauBonusConstitution, setNouveauBonusConstitution,
+    nouveauIntelligence, setNouveauIntelligence,
+    nouveauBonusIntelligence, setNouveauBonusIntelligence,
+    nouveauSagesse, setNouveauSagesse,
+    nouveauBonusSagesse, setNouveauBonusSagesse,
+    nouveauCharisme, setNouveauCharisme,
+    nouveauBonusCharisme, setNouveauBonusCharisme,
+    nouveauAge, setNouveauAge,
+    nouveauSexe, setNouveauSexe,
+    nouveauTaille, setNouveauTaille,
+    nouveauPoids, setNouveauPoids,
+    nouveauAlignement, setNouveauAlignement,
+   nouveauPointExperianceAcquis, setNouveauPointExperianceAcquis,
+    nouveauPointExpObjectif, setNouveauPointExpObjectif,
+    nouveauAttaque, setNouveauAttaque,
+    nouveauDefense, setNouveauDefense,
+    nouveauSort, setNouveauSort,
+    nouveauEquipement, setNouveauEquipement,
+    nouveauApparence, setNouveauApparence,
+    nouveauHistoire, setNouveauHistoire,
+    nouveauAlies, setNouveauAlies,
+    nouveauTresor, setNouveauTresor,
+    nouveauNotes, setNouveauNotes,
+    nouveauNotesSort, setNouveauNotesSort,
+    ajouterPersonnage,
+    loadRace,
+    loadClasse,
+    loadPersonnage
+  } = useContext(FicheDNDContexte) as DNDFicheContexteType;
 
-<Text style={styles.label}>Intelligence</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newIntelligence)}
-  onChangeText={(val) => setNewIntelligence(Number(val))}
-/>
+const { races: race, classes: classe } = useContext(FicheDNDContexte) as DNDFicheContexteType;
 
-<Text style={styles.label}>Bonus Intelligence</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newBonusIntelligence)}
-  onChangeText={(val) => setNewBonusIntelligence(Number(val))}
-/>
 
-<Text style={styles.label}>Sagesse</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newSagesse)}
-  onChangeText={(val) => setNewSagesse(Number(val))}
-/>
+  
 
-<Text style={styles.label}>Bonus Sagesse</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newBonusSagesse)}
-  onChangeText={(val) => setNewBonusSagesse(Number(val))}
-/>
+  useEffect(() => {
+    const init = async () => {
+      await loadRace();
+      await loadClasse();
+      
+    };
+    init();
+  }, [loadRace, loadClasse]);
 
-<Text style={styles.label}>Charisme</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newCharisme)}
-  onChangeText={(val) => setNewCharisme(Number(val))}
-/>
+// États pour stocker les valeurs sélectionnées dans les dropdowns
+  const [selectedRaceValeur, setSelectedRaceValeur] = useState<{ id: number, name: string } | null>(null);
+  const [selectedClasseValeur, setSelectedClasseValeur] = useState<{ id: number, name: string } | null>(null);
 
-<Text style={styles.label}>Bonus Charisme</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newBonusCharisme)}
-  onChangeText={(val) => setNewBonusCharisme(Number(val))}
-/>
+  // Création des données pour les dropdowns
+  const raceDropdownData = race.map((item) => ({ label: item.race, value: item.id }));
+  const classeDropdownData = classe.map((item) => ({ label: item.classe, value: item.id }));
 
-<Text style={styles.label}>Vitesse</Text>
-<Picker
-  selectedValue={newVitesse}
-  onValueChange={(itemValue) => setNewVitesse(itemValue)}
- 
->
-  {[...Array(61).keys()].map((val) => (
-    <Picker.Item key={val} label={`${val}`} value={val} />
-  ))}
-</Picker>
+  // Fonction pour gérer l'ajout du personnage
+  const handleAjouter = () => {
+    const nouveauPersonnage = {
+      id: 0,
+      nomPersonnage: nouveauNomPersonnage,
+      classe_id: nouveauClasse_id,
+      race_id: nouveauRace_id,
+      niveau: nouveauNiveau,
+      pvMax: nouveauPvMax,
+      pvActuel: nouveauPvActuel,
+      force: nouveauForce,
+      bonusForce: nouveauBonusForce,
+      dexterite: nouveauDexterite,
+      bonusDexterite: nouveauBonusDexterite,
+      constitution: nouveauConstitution,
+      bonusConstitution: nouveauBonusConstitution,
+      intelligence: nouveauIntelligence,
+      bonusIntelligence: nouveauBonusIntelligence,
+      sagesse: nouveauSagesse,
+      bonusSagesse: nouveauBonusSagesse,
+      charisme: nouveauCharisme,
+      bonusCharisme: nouveauBonusCharisme,
+      age: nouveauAge,
+      sexe: nouveauSexe,
+      taille: nouveauTaille,
+      poids: nouveauPoids,
+      alignement: nouveauAlignement,
+      pointExpAcquis: nouveauPointExperianceAcquis,
+      pointExpObjectif: nouveauPointExpObjectif,
+      attaque: nouveauAttaque,
+      defense: nouveauDefense,
+      sort: nouveauSort,
+      equipement: nouveauEquipement,
+      apparence: nouveauApparence,
+      histoire: nouveauHistoire,
+      alies: nouveauAlies,
+      tresor: nouveauTresor,
+      notes: nouveauNotes,
+      notesSort: nouveauNotesSort,
+      vitesse: nouveauVitesse,
+    };
+    loadPersonnage(); // Recharger les personnages après l'ajout
+    ajouterPersonnage(nouveauPersonnage);
+    Alert.alert("Succès", "Personnage ajouté !");
+    navigation.goBack();
+  };
+    // Fonction pour rendre les labels
+    const renderLabel = (label: string) => (
+      <Text style={[styles.label, { color: couleurTexte }]}>{label}</Text>
+    );
+  
+  // Rendu du composant TextInput pour les champs texte et numérique 
+    const renderInput = (value: string, setValue: (v: string) => void, placeholder?: string, keyboardType: 'default' | 'numeric' = 'default') => (
+      <TextInput
+        style={[styles.input, { color: couleurTexte, backgroundColor: couleurInput, borderColor: couleurBordure }]}
+        value={value}
+        onChangeText={setValue}
+        placeholder={placeholder}
+        placeholderTextColor={themeActuel === 'clair' ? '#888' : '#aaa'}
+        keyboardType={keyboardType}
+      />
+    );
+  
+    // Rendu du composant Picker pour les attributs numériques (0-60) 
+    const renderPicker = (value: number, setValue: (v: number) => void) => (
+      <Picker
+        selectedValue={value}
+        onValueChange={setValue}
+        style={{ color: couleurTexte, backgroundColor: couleurInput }}
+      >
+        {[...Array(61).keys()].map((val) => (
+          <Picker.Item key={val} label={`${val}`} value={val} />
+        ))}
+      </Picker>
+    );
+  
+// Retourne le formulaire d'ajout de personnage
+  return (
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: couleurFond }]}>
+      <Text style={[styles.titre, { color: couleurTexte }]}>Créer un personnage</Text>
 
-<Text style={styles.label}>Attaque</Text>
-<TextInput
-  style={styles.input}
-  value={newAttaque}
-  onChangeText={setNewAttaque}
-/>
+      {renderLabel('nom du personnage')}
+      {renderInput(nouveauNomPersonnage, setNouveauNomPersonnage, 'Nom du personnage')}
 
-<Text style={styles.label}>Défense</Text>
-<TextInput
-  style={styles.input}
-  keyboardType="numeric"
-  value={String(newDefense)}
-  onChangeText={(val) => setNewDefense(Number(val))}
-/>
+      {/* Sélection de la race */}
+      <Text style={[styles.label, { color: couleurTexte }]}>Race</Text>
+      <Dropdown
+        style={[styles.dropdown, { backgroundColor: couleurInput, borderColor: couleurBordure }]}
+        containerStyle={{ backgroundColor: themeActuel === 'sombre' ? '#666' : '#eee' }}
+        itemTextStyle={{ color: '#000' }}
+        placeholderStyle={{ color: themeActuel === 'sombre' ? 'white' : '#999' }}
+        selectedTextStyle={{ color: couleurTexte }}
+        data={raceDropdownData}
+        labelField="label"
+        valueField="value"
+        placeholder="-- Choisir une race --"
+        value={nouveauRace_id}
+        onChange={(item) => {
+          setNouveauRace_id(item.value);
+          setSelectedRaceValeur({ id: item.value, name: item.label });
+        }}
+      />
 
-<Text style={styles.label}>Sort</Text>
-<TextInput
-  style={styles.input}
-  value={newSort}
-  onChangeText={setNewSort}
-/>
+      {/* Sélection de la classe */}
+      <Text style={[styles.label, { color: couleurTexte }]}>Classe</Text>
+      <Dropdown
+        style={[styles.dropdown, { backgroundColor: couleurInput, borderColor: couleurBordure }]}
+        containerStyle={{ backgroundColor: themeActuel === 'sombre' ? '#666' : '#eee' }}
+        itemTextStyle={{ color: '#000' }}
+        placeholderStyle={{ color: themeActuel === 'sombre' ? 'white' : '#999' }}
+        selectedTextStyle={{ color: couleurTexte }}
+        data={classeDropdownData}
+        labelField="label"
+        valueField="value"
+        placeholder="-- Choisir une classe --"
+        value={nouveauClasse_id}
+        onChange={(item) => {
+          setNouveauClasse_id(item.value);
+          setSelectedClasseValeur({ id: item.value, name: item.label });
+        }}
+      />
 
-<Text style={styles.label}>Équipement</Text>
-<TextInput
-  style={styles.input}
-  value={newEquipement}
-  onChangeText={setNewEquipement}
-/>
+      {renderLabel('Niveau')}
+            {renderInput(String(nouveauNiveau), (val) => setNouveauNiveau(Number(val)), 'Niveau', 'numeric')}
+      
+            {renderLabel('Âge')}
+            {renderInput(String(nouveauAge), (val) => setNouveauAge(Number(val)), 'Âge', 'numeric')}
+      
+            {renderLabel('Sexe')}
+            {renderInput(nouveauSexe, setNouveauSexe, 'Sexe')}
+      
+            {renderLabel('Taille')}
+            {renderInput(nouveauTaille, setNouveauTaille, 'Taille')}
 
-<Text style={styles.label}>Apparence</Text>
-<TextInput
-  style={styles.input}
-  value={newApparence}
-  onChangeText={setNewApparence}
-/>
+            {renderLabel('Poids')}
+            {renderInput(nouveauPoids, setNouveauPoids, 'Poids')}
 
-<Text style={styles.label}>Histoire</Text>
-<TextInput
-  style={styles.input}
-  value={newHistoire}
-  onChangeText={setNewHistoire}
-/>
+            {renderLabel('Alignement')}
+            {renderInput(nouveauAlignement, setNouveauAlignement, 'Alignement')}
+      
+            {renderLabel("XP Objectif")}
+            {renderInput(String(nouveauPointExpObjectif), (val) => setNouveauPointExpObjectif(Number(val)), '', 'numeric')}
+      
+            {renderLabel("XP Acquis")}
+            {renderInput(String(nouveauPointExperianceAcquis), (val) => setNouveauPointExperianceAcquis(Number(val)), '', 'numeric')}
+      
+            {renderLabel("PV Max")}
+            {renderInput(String(nouveauPvMax), (val) => setNouveauPvMax(Number(val)), '', 'numeric')}
+      
+            {renderLabel("PV Actuel")}
+            {renderInput(String(nouveauPvActuel), (val) => setNouveauPvActuel(Number(val)), '', 'numeric')}
+      
+            {renderLabel("Force")}
+            {renderPicker(nouveauForce, setNouveauForce)}
+      
+            {renderLabel("Bonus Force")}
+            {renderPicker(nouveauBonusForce, setNouveauBonusForce)}
+      
+            {renderLabel("Dextérité")}
+            {renderPicker(nouveauDexterite, setNouveauDexterite)}
+      
+            {renderLabel("Bonus Dextérité")}
+            {renderPicker(nouveauBonusDexterite, setNouveauBonusDexterite)}
+      
+            {renderLabel("Constitution")}
+            {renderPicker(nouveauConstitution, setNouveauConstitution)}
+      
+            {renderLabel("Bonus Constitution")}
+            {renderPicker(nouveauBonusConstitution, setNouveauBonusConstitution)}
+      
+            {renderLabel("Intelligence")}
+            {renderPicker(nouveauIntelligence, setNouveauIntelligence)}
+      
+            {renderLabel("Bonus Intelligence")}
+            {renderPicker(nouveauBonusIntelligence, setNouveauBonusIntelligence)}
+      
+            {renderLabel("Sagesse")}
+            {renderPicker(nouveauSagesse, setNouveauSagesse)}
+      
+            {renderLabel("Bonus Sagesse")}
+            {renderPicker(nouveauBonusSagesse, setNouveauBonusSagesse)}
+      
+            {renderLabel("Charisme")}
+            {renderPicker(nouveauCharisme, setNouveauCharisme)}
+      
+            {renderLabel("Bonus Charisme")}
+            {renderPicker(nouveauBonusCharisme, setNouveauBonusCharisme)}
+      
+            {renderLabel("Vitesse")}
+            {renderPicker(nouveauVitesse, setNouveauVitesse)}
+      
+            {renderLabel("Attaque")}
+            {renderInput(nouveauAttaque, setNouveauAttaque, 'Attaque')}
+      
+            {renderLabel("Défense")}
+            {renderPicker(nouveauDefense, setNouveauDefense)}
+      
+            {renderLabel("Sort")}
+            {renderInput(nouveauSort, setNouveauSort, 'Sort')}
+      
+            {renderLabel("Équipement")}
+            {renderInput(nouveauEquipement, setNouveauEquipement, 'Équipement')}
+      
+            {renderLabel("Apparence")}
+            {renderInput(nouveauApparence, setNouveauApparence, 'Apparence')}
+      
+            {renderLabel("Histoire")}
+            {renderInput(nouveauHistoire, setNouveauHistoire, 'Histoire')}
+      
+            {renderLabel("Alliés")}
+            {renderInput(nouveauAlies, setNouveauAlies, 'Alliés' )}
+      
+            {renderLabel("Trésor")}
+            {renderInput(nouveauTresor, setNouveauTresor, 'Trésor')}
+      
+            {renderLabel("Notes")}
+            {renderInput(nouveauNotes, setNouveauNotes, 'Notes')}
 
-<Text style={styles.label}>Alliés</Text>
-<TextInput
-  style={styles.input}
-  value={newAlies}
-  onChangeText={setNewAlies}
-/>
-
-<Text style={styles.label}>Trésor</Text>
-<TextInput
-  style={styles.input}
-  value={newTresor}
-  onChangeText={setNewTresor}
-/>
-
-<Text style={styles.label}>Notes</Text>
-<TextInput
-  style={styles.input}
-  value={newNotes}
-  onChangeText={setNewNotes}
-/>
-
-<Text style={styles.label}>Notes de sort</Text>
-<TextInput
-  style={styles.input}
-  value={newNotesSort}
-  onChangeText={setNewNotesSort}
-/>
-
-      <TouchableOpacity style={styles.bouton} onPress={ajouter}>
-        <Text style={styles.boutonTexte}>Ajouter le personnage</Text>
+            {renderLabel("Notes de sort")}
+            {renderInput(nouveauNotesSort, setNouveauNotesSort, 'Notes de sort')}
+            
+          {/* Bouton pour ajouter le personnage */}
+            <TouchableOpacity
+        style={[styles.bouton, { backgroundColor: themeActuel === 'clair' ? '#34C759' : '#228B22' }]}
+        onPress={handleAjouter}
+      >
+        <Text style={[styles.boutonTexte, { color: themeActuel === 'clair' ? '#fff' : '#e0ffe0' }]}>
+          Ajouter le personnage
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
 };
 
+// Styles pour le composant EcranAjout
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: 'white',
   },
   titre: {
     fontSize: 26,
@@ -407,22 +343,30 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 8,
     padding: 10,
     marginBottom: 15,
   },
+  dropdown: {
+    height: 50,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
   bouton: {
-    backgroundColor: '#34C759',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
   },
   boutonTexte: {
-    color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  selectedRace: {
+    marginBottom: 10,
+    fontStyle: 'italic',
   },
 });
 
