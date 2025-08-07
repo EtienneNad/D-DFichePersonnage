@@ -47,7 +47,7 @@ const EcranDe = ({ }: Props) => {
           { backgroundColor: couleurs.background },
         ]}
       >
-        <Text style={[styles.titre, { color: couleurs.texte }]}>Lancer de dés</Text>
+        <Text style={[styles.titre, { color: couleurs.texte }]}>Lancer de dés 🎲</Text>
         <View style={styles.buttonContainer}>
           {/* Boutons pour chaque type de dé */}
           {listeDes.map((faces) => (
@@ -57,7 +57,7 @@ const EcranDe = ({ }: Props) => {
               onPress={() => genererDe(faces)}
             >
               <Text style={styles.boutonTexte}>
-                {des[`🎲${faces}`] !== null ? `${des[`🎲${faces}`]}` : `🎲${faces}`}
+                {des[`d${faces}`] !== null ? `${des[`d${faces}`]}` : `d${faces}`}
               </Text>
             </TouchableOpacity>
           ))}
