@@ -138,12 +138,12 @@ const { races: race, classes: classe } = useContext(FicheDNDContexte) as DNDFich
     navigation.goBack();
   };
     // Fonction pour rendre les labels
-    const renderLabel = (label: string) => (
+    const renduLabel = (label: string) => (
       <Text style={[styles.label, { color: couleurTexte }]}>{label}</Text>
     );
   
   // Rendu du composant TextInput pour les champs texte et numérique 
-    const renderInput = (value: string, setValue: (v: string) => void, placeholder?: string, keyboardType: 'default' | 'numeric' = 'default') => (
+    const renduInput = (value: string, setValue: (v: string) => void, placeholder?: string, keyboardType: 'default' | 'numeric' = 'default') => (
       <TextInput
         style={[styles.input, { color: couleurTexte, backgroundColor: couleurInput, borderColor: couleurBordure }]}
         value={value}
@@ -155,12 +155,13 @@ const { races: race, classes: classe } = useContext(FicheDNDContexte) as DNDFich
     );
   
     // Rendu du composant Picker pour les attributs numériques (0-60) 
-    const renderPicker = (value: number, setValue: (v: number) => void) => (
+    const renduPicker = (value: number, setValue: (v: number) => void) => (
       <Picker
         selectedValue={value}
         onValueChange={setValue}
         style={{ color: couleurTexte, backgroundColor: couleurInput }}
       >
+        {/* Génération des options de 0 à 60 */}
         {[...Array(61).keys()].map((val) => (
           <Picker.Item key={val} label={`${val}`} value={val} />
         ))}
@@ -172,8 +173,8 @@ const { races: race, classes: classe } = useContext(FicheDNDContexte) as DNDFich
     <ScrollView contentContainerStyle={[styles.container, { backgroundColor: couleurFond }]}>
       <Text style={[styles.titre, { color: couleurTexte }]}>Créer un personnage</Text>
 
-      {renderLabel('nom du personnage')}
-      {renderInput(nouveauNomPersonnage, setNouveauNomPersonnage, 'Nom du personnage')}
+      {renduLabel('nom du personnage')}
+      {renduInput(nouveauNomPersonnage, setNouveauNomPersonnage, 'Nom du personnage')}
 
       {/* Sélection de la race */}
       <Text style={[styles.label, { color: couleurTexte }]}>Race</Text>
@@ -213,104 +214,104 @@ const { races: race, classes: classe } = useContext(FicheDNDContexte) as DNDFich
         }}
       />
 
-      {renderLabel('Niveau')}
-            {renderInput(String(nouveauNiveau), (val) => setNouveauNiveau(Number(val)), 'Niveau', 'numeric')}
+      {renduLabel('Niveau')}
+            {renduInput(String(nouveauNiveau), (val) => setNouveauNiveau(Number(val)), 'Niveau', 'numeric')}
       
-            {renderLabel('Âge')}
-            {renderInput(String(nouveauAge), (val) => setNouveauAge(Number(val)), 'Âge', 'numeric')}
+            {renduLabel('Âge')}
+            {renduInput(String(nouveauAge), (val) => setNouveauAge(Number(val)), 'Âge', 'numeric')}
       
-            {renderLabel('Sexe')}
-            {renderInput(nouveauSexe, setNouveauSexe, 'Sexe')}
+            {renduLabel('Sexe')}
+            {renduInput(nouveauSexe, setNouveauSexe, 'Sexe')}
       
-            {renderLabel('Taille')}
-            {renderInput(nouveauTaille, setNouveauTaille, 'Taille')}
+            {renduLabel('Taille')}
+            {renduInput(nouveauTaille, setNouveauTaille, 'Taille')}
 
-            {renderLabel('Poids')}
-            {renderInput(nouveauPoids, setNouveauPoids, 'Poids')}
+            {renduLabel('Poids')}
+            {renduInput(nouveauPoids, setNouveauPoids, 'Poids')}
 
-            {renderLabel('Alignement')}
-            {renderInput(nouveauAlignement, setNouveauAlignement, 'Alignement')}
+            {renduLabel('Alignement')}
+            {renduInput(nouveauAlignement, setNouveauAlignement, 'Alignement')}
       
-            {renderLabel("XP Objectif")}
-            {renderInput(String(nouveauPointExpObjectif), (val) => setNouveauPointExpObjectif(Number(val)), '', 'numeric')}
+            {renduLabel("XP Objectif")}
+            {renduInput(String(nouveauPointExpObjectif), (val) => setNouveauPointExpObjectif(Number(val)), '', 'numeric')}
       
-            {renderLabel("XP Acquis")}
-            {renderInput(String(nouveauPointExperianceAcquis), (val) => setNouveauPointExperianceAcquis(Number(val)), '', 'numeric')}
+            {renduLabel("XP Acquis")}
+            {renduInput(String(nouveauPointExperianceAcquis), (val) => setNouveauPointExperianceAcquis(Number(val)), '', 'numeric')}
       
-            {renderLabel("PV Max")}
-            {renderInput(String(nouveauPvMax), (val) => setNouveauPvMax(Number(val)), '', 'numeric')}
+            {renduLabel("PV Max")}
+            {renduInput(String(nouveauPvMax), (val) => setNouveauPvMax(Number(val)), '', 'numeric')}
       
-            {renderLabel("PV Actuel")}
-            {renderInput(String(nouveauPvActuel), (val) => setNouveauPvActuel(Number(val)), '', 'numeric')}
+            {renduLabel("PV Actuel")}
+            {renduInput(String(nouveauPvActuel), (val) => setNouveauPvActuel(Number(val)), '', 'numeric')}
       
-            {renderLabel("Force")}
-            {renderPicker(nouveauForce, setNouveauForce)}
+            {renduLabel("Force")}
+            {renduPicker(nouveauForce, setNouveauForce)}
       
-            {renderLabel("Bonus Force")}
-            {renderPicker(nouveauBonusForce, setNouveauBonusForce)}
+            {renduLabel("Bonus Force")}
+            {renduPicker(nouveauBonusForce, setNouveauBonusForce)}
       
-            {renderLabel("Dextérité")}
-            {renderPicker(nouveauDexterite, setNouveauDexterite)}
+            {renduLabel("Dextérité")}
+            {renduPicker(nouveauDexterite, setNouveauDexterite)}
       
-            {renderLabel("Bonus Dextérité")}
-            {renderPicker(nouveauBonusDexterite, setNouveauBonusDexterite)}
+            {renduLabel("Bonus Dextérité")}
+            {renduPicker(nouveauBonusDexterite, setNouveauBonusDexterite)}
       
-            {renderLabel("Constitution")}
-            {renderPicker(nouveauConstitution, setNouveauConstitution)}
+            {renduLabel("Constitution")}
+            {renduPicker(nouveauConstitution, setNouveauConstitution)}
       
-            {renderLabel("Bonus Constitution")}
-            {renderPicker(nouveauBonusConstitution, setNouveauBonusConstitution)}
+            {renduLabel("Bonus Constitution")}
+            {renduPicker(nouveauBonusConstitution, setNouveauBonusConstitution)}
       
-            {renderLabel("Intelligence")}
-            {renderPicker(nouveauIntelligence, setNouveauIntelligence)}
+            {renduLabel("Intelligence")}
+            {renduPicker(nouveauIntelligence, setNouveauIntelligence)}
       
-            {renderLabel("Bonus Intelligence")}
-            {renderPicker(nouveauBonusIntelligence, setNouveauBonusIntelligence)}
+            {renduLabel("Bonus Intelligence")}
+            {renduPicker(nouveauBonusIntelligence, setNouveauBonusIntelligence)}
       
-            {renderLabel("Sagesse")}
-            {renderPicker(nouveauSagesse, setNouveauSagesse)}
+            {renduLabel("Sagesse")}
+            {renduPicker(nouveauSagesse, setNouveauSagesse)}
       
-            {renderLabel("Bonus Sagesse")}
-            {renderPicker(nouveauBonusSagesse, setNouveauBonusSagesse)}
+            {renduLabel("Bonus Sagesse")}
+            {renduPicker(nouveauBonusSagesse, setNouveauBonusSagesse)}
       
-            {renderLabel("Charisme")}
-            {renderPicker(nouveauCharisme, setNouveauCharisme)}
+            {renduLabel("Charisme")}
+            {renduPicker(nouveauCharisme, setNouveauCharisme)}
       
-            {renderLabel("Bonus Charisme")}
-            {renderPicker(nouveauBonusCharisme, setNouveauBonusCharisme)}
+            {renduLabel("Bonus Charisme")}
+            {renduPicker(nouveauBonusCharisme, setNouveauBonusCharisme)}
       
-            {renderLabel("Vitesse")}
-            {renderPicker(nouveauVitesse, setNouveauVitesse)}
+            {renduLabel("Vitesse")}
+            {renduPicker(nouveauVitesse, setNouveauVitesse)}
       
-            {renderLabel("Attaque")}
-            {renderInput(nouveauAttaque, setNouveauAttaque, 'Attaque')}
+            {renduLabel("Attaque")}
+            {renduInput(nouveauAttaque, setNouveauAttaque, 'Attaque')}
       
-            {renderLabel("Défense")}
-            {renderPicker(nouveauDefense, setNouveauDefense)}
+            {renduLabel("Défense")}
+            {renduPicker(nouveauDefense, setNouveauDefense)}
       
-            {renderLabel("Sort")}
-            {renderInput(nouveauSort, setNouveauSort, 'Sort')}
+            {renduLabel("Sort")}
+            {renduInput(nouveauSort, setNouveauSort, 'Sort')}
       
-            {renderLabel("Équipement")}
-            {renderInput(nouveauEquipement, setNouveauEquipement, 'Équipement')}
+            {renduLabel("Équipement")}
+            {renduInput(nouveauEquipement, setNouveauEquipement, 'Équipement')}
       
-            {renderLabel("Apparence")}
-            {renderInput(nouveauApparence, setNouveauApparence, 'Apparence')}
+            {renduLabel("Apparence")}
+            {renduInput(nouveauApparence, setNouveauApparence, 'Apparence')}
       
-            {renderLabel("Histoire")}
-            {renderInput(nouveauHistoire, setNouveauHistoire, 'Histoire')}
+            {renduLabel("Histoire")}
+            {renduInput(nouveauHistoire, setNouveauHistoire, 'Histoire')}
       
-            {renderLabel("Alliés")}
-            {renderInput(nouveauAlies, setNouveauAlies, 'Alliés' )}
+            {renduLabel("Alliés")}
+            {renduInput(nouveauAlies, setNouveauAlies, 'Alliés' )}
       
-            {renderLabel("Trésor")}
-            {renderInput(nouveauTresor, setNouveauTresor, 'Trésor')}
+            {renduLabel("Trésor")}
+            {renduInput(nouveauTresor, setNouveauTresor, 'Trésor')}
       
-            {renderLabel("Notes")}
-            {renderInput(nouveauNotes, setNouveauNotes, 'Notes')}
+            {renduLabel("Notes")}
+            {renduInput(nouveauNotes, setNouveauNotes, 'Notes')}
 
-            {renderLabel("Notes de sort")}
-            {renderInput(nouveauNotesSort, setNouveauNotesSort, 'Notes de sort')}
+            {renduLabel("Notes de sort")}
+            {renduInput(nouveauNotesSort, setNouveauNotesSort, 'Notes de sort')}
             
           {/* Bouton pour ajouter le personnage */}
             <TouchableOpacity

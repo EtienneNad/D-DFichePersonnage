@@ -148,6 +148,7 @@ const EcranModification = ({ route, navigation }: Props) => {
       onValueChange={setValeur}
       style={{ color: couleurTexte, backgroundColor: couleurInput }}
     >
+      {/* Génération des options de 0 à 60 */}
       {[...Array(61).keys()].map((val) => (
         <Picker.Item key={val} label={`${val}`} value={val} />
       ))}
